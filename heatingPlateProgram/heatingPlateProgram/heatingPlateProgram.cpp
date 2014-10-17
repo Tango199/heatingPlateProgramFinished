@@ -10,18 +10,117 @@
 using namespace std;
 
 // 1001 because of the constant area around
-const int maxSize=1001;
+const int maxSize=1002;
 
 float array1[maxSize][maxSize];
 float array2[maxSize][maxSize];
-static float eplsilonCutOff = 0.01;
+const float eplsilonCutOff = 0.01;
 const int maxIterations = 5000;
 
 clock_t startIteration,endIteration,startProgram, endProgram;
 float differenceIteration=0.0;
 float differenceProgram=0.0;
-//int numThreadsCounter=1;
+int numThreadsCounter=4;
+void eyeCandy(int counter,float changedTempFromIteration);
+void printArray();
+float calculateChange(int numThreadsCounter);
 
+int main()
+{
+	//runs the program multiple times to see best thread vs time
+	//for(int numThreadsCounter=4; numThreadsCounter<=16; numThreadsCounter++)
+	//{
+
+		startProgram = clock();
+		int counter = 1;
+		const float linearyDifferenceConstant = (float)100/(maxSize);
+		float linearyDifference = linearyDifferenceConstant;
+		float changedTempFrom1Interation=100.0;
+
+		//set up the initial heating plate with the constants that need set
+		for(int r=0; r<maxSize;r++)
+		{
+			for(int c=0; c<maxSize; c++)
+			{
+				array1[r][c] =0;
+			}
+		}
+	
+		//right side
+		for(int c=0; c<maxSize;c++)
+		{
+			array1[c][maxSize-1] = linearyDifference;
+			linearyDifference = linearyDifference + linearyDifferenceConstant;
+		
+		}
+	
+		linearyDifference = linearyDifferenceConstant;
+		//bottom side
+		for(int r=0; r<maxSize; r++)
+		{
+			array1[maxSize-1][r] = linearyDifference;
+			linearyDifference = linearyDifference + linearyDifferenceConstant;
+		}
+	
+	
+
+	//breaks out of loop if counter <= max iterations
+		while(counter <= maxIterations && changedTempFrom1Interation >= eplsilonCutOff)
+		{
+			//startIteration = clock();
+			changedTempFrom1Interation = calculateChange(numThreadsCounter); //goes to the calculate change function, which does an interation across the plate changing the temp
+			//endIteration = clock();
+			//every 100 iterations print out info for the user
+			if(counter % 100 == 0)
+			{
+				eyeCandy(counter,changedTempFrom1Interation);
+			}
+			//printArray();
+			counter++;
+		
+		}
+
+			//if epsiloncutoff is hit, print out info and set counter to 5001 and kick out of loop
+			if(changedTempFrom1Interation <= eplsilonCutOff)
+			{
+				eyeCandy(counter,changedTempFrom1Interation);
+
+				endProgram = clock();
+				ofstream myfile; //outputs results to text file for testing purposes
+				myfile.open ("results.txt",ios::app);
+				myfile << "Iteration count is " << counter << endl;
+				myfile <<  "The max temperature change for this iteration was " << changedTempFrom1Interation << endl;
+				myfile << "The number of threads was " << numThreadsCounter << endl;
+				myfile << "The time it took for the whole program to run was " << (float)((endProgram - startProgram)/CLOCKS_PER_SEC) << " seconds" << endl;
+				myfile << endl;
+				myfile << endl;
+				myfile.close();
+				cout << "The time it took for the whole program to run was " << (float)((endProgram - startProgram)/CLOCKS_PER_SEC) << " seconds" << endl;
+			}
+			else if(counter <=maxIterations)
+			{
+				cout << "You hit max iterations" << endl;
+			}
+		
+			
+	//}
+		system("pause");
+		return 0;
+
+}
+
+//prints the array out for testing purposes
+void printArray()
+{
+	for(int c=0; c < maxSize; c++)
+	{
+		for(int r=0; r < maxSize; r++)
+		{
+			cout << array1[c][r] << " ";
+		}
+		cout << endl;
+	}
+}
 //prints out output for the user to see
 void eyeCandy(int counter,float changedTempFromIteration)
 {
@@ -29,14 +128,16 @@ void eyeCandy(int counter,float changedTempFromIteration)
 	cout << "Iteration count is " << counter << endl;
 	cout << "The max temperature change for this iteration was " << changedTempFromIteration << endl;
 	//cout << "The time it took for the last iteration was " << (float)((endIteration - startIteration)/CLOCKS_PER_SEC) <<" seconds" << endl;
-	cout << array1[maxSize-1][maxSize-1] << endl;
-	cout << array1[maxSize-2][maxSize-2] << endl;
-	cout << array1[maxSize-3][maxSize-3] << endl;
-	cout << array1[maxSize-4][maxSize-4] << endl;
-	cout << array1[maxSize-5][maxSize-5] << endl;
+
+	for(int i=1; i <= 5; i++)
+	{
+		cout << array1[maxSize-i][maxSize-i] << endl;
+	}
+
 
 
 }
+//this funcation calculates the change between the places on the plate
 
 float calculateChange(int numThreadsCounter)
 {
@@ -70,88 +171,7 @@ float calculateChange(int numThreadsCounter)
 
 
 
-int main()
-{
-	//runs the program multiple times to see best thread vs time
-	for(int numThreadsCounter=1; numThreadsCounter<=16; numThreadsCounter++)
-	{
 
-		startProgram = clock();
-		int counter = 0;
-		const float linearyDifferenceConstant = (float)100/(maxSize);
-		float linearyDifference = linearyDifferenceConstant;
-		float changedTempFrom1Interation=0.0;
-
-		//set up the initial heating plate with the constants that need set
-		for(int r=0; r<maxSize;r++)
-		{
-			for(int c=0; c<maxSize; c++)
-			{
-				array1[r][c] =0;
-			}
-		}
-	
-		//right side
-		for(int c=0; c<maxSize;c++)
-		{
-			array1[c][maxSize-1] = linearyDifference;
-			linearyDifference = linearyDifference + linearyDifferenceConstant;
-		
-		}
-	
-		linearyDifference = linearyDifferenceConstant;
-		//bottom side
-		for(int r=0; r<maxSize; r++)
-		{
-			array1[maxSize-1][r] = linearyDifference;
-			linearyDifference = linearyDifference + linearyDifferenceConstant;
-		}
-	
-	
-	//breaks out of loop if counter <= max iterations
-		for(int counter=1; counter <= maxIterations; counter++)
-		{
-			//startIteration = clock();
-			changedTempFrom1Interation = calculateChange(numThreadsCounter); //goes to the calculate change function, which does an interation across the plate changing the temp
-			//endIteration = clock();
-			//every 100 iterations print out info for the user
-			if(counter % 100 == 0)
-			{
-				eyeCandy(counter,changedTempFrom1Interation);
-			}
-			//if epsiloncutoff is hit, print out info and set counter to 5001 and kick out of loop
-			if(changedTempFrom1Interation <= eplsilonCutOff)
-			{
-				cout << "Iteration count is " << counter << endl;
-				cout << "The max temperature change for this iteration was " << changedTempFrom1Interation << endl;
-				cout << array1[maxSize-1][maxSize-1] << endl;
-				cout << array1[maxSize-2][maxSize-2] << endl;
-				cout << array1[maxSize-3][maxSize-3] << endl;
-				cout << array1[maxSize-4][maxSize-4] << endl;
-				cout << array1[maxSize-5][maxSize-5] << endl;
-
-				endProgram = clock();
-				ofstream myfile; //outputs results to text file for testing purposes
-				myfile.open ("results.txt",ios::app);
-				myfile << "Iteration count is " << counter << endl;
-				myfile <<  "The max temperature change for this iteration was " << changedTempFrom1Interation << endl;
-				myfile << "The number of threads was " << numThreadsCounter << endl;
-				myfile << "The time it took for the whole program to run was " << (float)((endProgram - startProgram)/CLOCKS_PER_SEC) << " seconds" << endl;
-				myfile << endl;
-				myfile << endl;
-				myfile.close();
-
-				counter = maxIterations +1;
-				
-				cout << "The time it took for the whole program to run was " << (float)((endProgram - startProgram)/CLOCKS_PER_SEC) << " seconds" << endl;
-			}
-
-		}
-	}
-		system("pause");
-		return 0;
-
-}
 
 
  	
