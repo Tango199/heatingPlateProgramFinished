@@ -4,3 +4,9 @@ The number of threads was 4
 The time it took for the whole program to run was 73 seconds
 
 
+Iteration count is 3316
+The max temperature change for this iteration was 0.00999832
+The number of threads was 4
+The time it took for the whole program to run was 562 seconds
+
+

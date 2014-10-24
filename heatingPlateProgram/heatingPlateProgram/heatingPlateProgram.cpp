@@ -141,22 +141,26 @@ void eyeCandy(int counter,float changedTempFromIteration)
 
 float calculateChange(int numThreadsCounter)
 {
-	float changedTemp = 0.0;
+	
 	float minTempChanged = 0.0;
 	
 	//open mp for loop to parallize the solution 
-#pragma omp parallel for reduction(+:changedTemp) num_threads(numThreadsCounter)
+#pragma omp parallel num_threads(numThreadsCounter)
+	{
+
+	float changedTemp = 0.0;
+#pragma omp for
 		for(int c=1; c<maxSize-1; c++)
 		{
 			for(int r=1;r<maxSize-1;r++)
 			{
 			  changedTemp = ((array1[c][r+1] + array1[c][r-1] + array1[c-1][r] + array1[c+1][r]) /4); //takes the average of the 4 neighbors 
-			
+#pragma omp critical
 				  if(minTempChanged < abs((array1[c][r] - changedTemp)))
 				  {
 					
 					  minTempChanged = abs((array1[c][r] - changedTemp)); //checks to see if it is smaller than last temp change
-				  }
+				  }	
 			  array2[c][r] = changedTemp; //sets array2 loc to the changedTemp
 			  array1[c][r] = array2[c][r]; //sets array1 loc to array2 loc
 
@@ -164,6 +168,7 @@ float calculateChange(int numThreadsCounter)
 
 
 		}
+	}
 	
 
 	return minTempChanged; //return the minTempChanged to main to check for epislon 
