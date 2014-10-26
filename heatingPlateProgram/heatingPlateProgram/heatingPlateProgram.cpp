@@ -5,11 +5,11 @@
 
 #include <iostream>
 #include <ctime>
-#include <omp.h>
+//#include <omp.h>
 #include <fstream>
 using namespace std;
 
-// 1001 because of the constant area around
+// 1002 because of the constant area around
 const int maxSize=1002;
 
 float array1[maxSize][maxSize];
@@ -145,17 +145,18 @@ float calculateChange(int numThreadsCounter)
 	float minTempChanged = 0.0;
 	
 	//open mp for loop to parallize the solution 
-#pragma omp parallel num_threads(numThreadsCounter)
-	{
+//#pragma omp parallel num_threads(numThreadsCounter)
+	//{
 
 	float changedTemp = 0.0;
-#pragma omp for
+//#pragma omp for
+#pragma acc parallel loop reduction(max:changedTemp)
 		for(int c=1; c<maxSize-1; c++)
 		{
 			for(int r=1;r<maxSize-1;r++)
 			{
 			  changedTemp = ((array1[c][r+1] + array1[c][r-1] + array1[c-1][r] + array1[c+1][r]) /4); //takes the average of the 4 neighbors 
-#pragma omp critical
+//#pragma omp critical
 				  if(minTempChanged < abs((array1[c][r] - changedTemp)))
 				  {
 					
@@ -168,7 +169,7 @@ float calculateChange(int numThreadsCounter)
 
 
 		}
-	}
+	//}
 	
 
 	return minTempChanged; //return the minTempChanged to main to check for epislon 
