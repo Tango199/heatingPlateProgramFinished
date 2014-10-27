@@ -1,11 +1,11 @@
 //Ryan Schleritzauer
-//Jacobi Iteration 
+//Jacobi Iteration
 //This program heats up a heating plate until the episolon value is hit, or the counter hits the max iterations
 //THe number that the serial solution answer is is 3371
 
 #include <iostream>
 #include <ctime>
-
+#include <cmath>
 #include <fstream>
 using namespace std;
 
@@ -28,12 +28,10 @@ float calculateChange(int numThreadsCounter);
 int main()
 {
 	//runs the program multiple times to see best thread vs time
-	
+
 
 		startProgram = clock();
 		int counter = 1;
-		const float linearyDifferenceConstant = (float)100/(maxSize);
-		float linearyDifference = linearyDifferenceConstant;
 		float changedTempFrom1Interation=100.0;
 
 		//set up the initial heating plate with the constants that need set
@@ -44,23 +42,23 @@ int main()
 				array1[r][c] =0;
 			}
 		}
-	
+
 		//right side
 		for(int c=0; c<maxSize;c++)
 		{
-			
+
 			array1[c][maxSize-1] = (c*100)/(maxSize-1.0);
-		
+
 		}
-	
+
 		//bottom side
 		for(int r=0; r<maxSize; r++)
 		{
-			
+
 
 			array1[maxSize-1][r] = (r*100)/(maxSize-1.0);
 		}
-	
+
 	//(r*100)/(MAX-1)
 #pragma acc data copy(array1),create(array2)
 	//breaks out of loop if counter <= max iterations
@@ -76,7 +74,7 @@ int main()
 			}
 			//printArray();
 			counter++;
-		
+
 		}
 
 			//if epsiloncutoff is hit, print out info and set counter to 5001 and kick out of loop
@@ -100,9 +98,9 @@ int main()
 			{
 				cout << "You hit max iterations" << endl;
 			}
-		
-			
-	
+
+
+
 		system("pause");
 		return 0;
 
@@ -140,20 +138,20 @@ void eyeCandy(int counter,float changedTempFromIteration)
 
 float calculateChange(int numThreadsCounter)
 {
-	
+
 	float minTempChanged = 0.0;
-	
+
 
 #pragma acc parallel loop reduction(max:minTempChanged)
 		for(int c=1; c<maxSize-1; c++)
 		{
 			for(int r=1;r<maxSize-1;r++)
 			{
-			  array2[c][r] = ((array1[c][r+1] + array1[c][r-1] + array1[c-1][r] + array1[c+1][r]) /4); //takes the average of the 4 neighbors 
-	
-			  minTempChanged = max(minTempChanged,abs(array2[c][r] - array1[c][r])); //checks to see if it is smaller than last temp change
-				 
-			 
+			  array2[c][r] = ((array1[c][r+1] + array1[c][r-1] + array1[c-1][r] + array1[c+1][r]) /4); //takes the average of the 4 neighbors
+
+			  minTempChanged = std::max(minTempChanged,(float)(abs(array2[c][r] - array1[c][r]))); //checks to see if it is smaller than last temp change
+				//minTempChanged = max(minTempChanged,(array2[c][r] - array1[c][r])); //checks to see if it is smaller than last temp change
+
 			}
 
 
@@ -166,14 +164,7 @@ float calculateChange(int numThreadsCounter)
 				array1[c][r] = array2[c][r];
 			}
 		}
-	
 
-	return minTempChanged; //return the minTempChanged to main to check for epislon 
+
+	return minTempChanged; //return the minTempChanged to main to check for epislon
 }
-
-
-
-
-
-
- 	
