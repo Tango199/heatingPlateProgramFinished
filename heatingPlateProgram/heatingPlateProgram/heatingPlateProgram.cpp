@@ -48,19 +48,15 @@ int main()
 		//right side
 		for(int c=0; c<maxSize;c++)
 		{
-			//array1[c][maxSize-1] = linearyDifference;
-			//linearyDifference = linearyDifference + linearyDifferenceConstant;
-
+			
 			array1[c][maxSize-1] = (c*100)/(maxSize-1.0);
 		
 		}
 	
-		linearyDifference = linearyDifferenceConstant;
 		//bottom side
 		for(int r=0; r<maxSize; r++)
 		{
-			//array1[maxSize-1][r] = linearyDifference;
-			//linearyDifference = linearyDifference + linearyDifferenceConstant;
+			
 
 			array1[maxSize-1][r] = (r*100)/(maxSize-1.0);
 		}
@@ -147,9 +143,6 @@ float calculateChange(int numThreadsCounter)
 	
 	float minTempChanged = 0.0;
 	
-	
-
-	float changedTemp = 0.0;
 
 #pragma acc parallel loop reduction(max:minTempChanged)
 		for(int c=1; c<maxSize-1; c++)

@@ -1,4 +1,4 @@
-﻿Build started 10/27/2014 11:45:02 AM.
+﻿Build started 10/27/2014 12:57:19 PM.
      1>Project "E:\gitRepo\heatingPlateProgramFinished\heatingPlateProgram\heatingPlateProgram\heatingPlateProgram.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Release\heatingPlateProgram.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -9,8 +9,8 @@
      1>heatingPlateProgram.cpp(54): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
      1>heatingPlateProgram.cpp(65): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
      1>heatingPlateProgram.cpp(69): warning C4068: unknown pragma
-     1>heatingPlateProgram.cpp(154): warning C4068: unknown pragma
-     1>heatingPlateProgram.cpp(168): warning C4068: unknown pragma
+     1>heatingPlateProgram.cpp(151): warning C4068: unknown pragma
+     1>heatingPlateProgram.cpp(165): warning C4068: unknown pragma
        Link:
          c:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"E:\gitRepo\heatingPlateProgramFinished\heatingPlateProgram\Release\heatingPlateProgram.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Release\heatingPlateProgram.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"E:\gitRepo\heatingPlateProgramFinished\heatingPlateProgram\Release\heatingPlateProgram.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"E:\gitRepo\heatingPlateProgramFinished\heatingPlateProgram\Release\heatingPlateProgram.lib" /MACHINE:X86 Release\heatingPlateProgram.obj
          Generating code
@@ -25,4 +25,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:04.53
+Time Elapsed 00:00:05.66
