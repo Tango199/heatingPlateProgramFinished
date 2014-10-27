@@ -48,8 +48,10 @@ int main()
 		//right side
 		for(int c=0; c<maxSize;c++)
 		{
-			array1[c][maxSize-1] = linearyDifference;
-			linearyDifference = linearyDifference + linearyDifferenceConstant;
+			//array1[c][maxSize-1] = linearyDifference;
+			//linearyDifference = linearyDifference + linearyDifferenceConstant;
+
+			array1[c][maxSize-1] = (c*100)/(maxSize-1.0);
 		
 		}
 	
@@ -57,11 +59,13 @@ int main()
 		//bottom side
 		for(int r=0; r<maxSize; r++)
 		{
-			array1[maxSize-1][r] = linearyDifference;
-			linearyDifference = linearyDifference + linearyDifferenceConstant;
+			//array1[maxSize-1][r] = linearyDifference;
+			//linearyDifference = linearyDifference + linearyDifferenceConstant;
+
+			array1[maxSize-1][r] = (r*100)/(maxSize-1.0);
 		}
 	
-	
+	//(r*100)/(MAX-1)
 #pragma acc data copy(array1),create(array2)
 	//breaks out of loop if counter <= max iterations
 		while(counter <= maxIterations && changedTempFrom1Interation >= eplsilonCutOff)
