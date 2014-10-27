@@ -9,7 +9,7 @@
 #include <fstream>
 using namespace std;
 
-// 1001 because of the constant area around
+// 1002 because of the constant area around
 const int maxSize=1002;
 
 float array1[maxSize][maxSize];
@@ -49,8 +49,10 @@ int main()
 		//right side
 		for(int c=0; c<maxSize;c++)
 		{
-			array1[c][maxSize-1] = linearyDifference;
-			linearyDifference = linearyDifference + linearyDifferenceConstant;
+			//array1[c][maxSize-1] = linearyDifference;
+			//linearyDifference = linearyDifference + linearyDifferenceConstant;
+
+			array1[c][maxSize-1] = (c*100)/(maxSize-1.0);
 		
 		}
 	
@@ -58,8 +60,9 @@ int main()
 		//bottom side
 		for(int r=0; r<maxSize; r++)
 		{
-			array1[maxSize-1][r] = linearyDifference;
-			linearyDifference = linearyDifference + linearyDifferenceConstant;
+			//array1[maxSize-1][r] = linearyDifference;
+			//linearyDifference = linearyDifference + linearyDifferenceConstant;
+			array1[maxSize-1][r] = (r*100)/(maxSize-1.0);
 		}
 	
 	
@@ -141,13 +144,13 @@ void eyeCandy(int counter,float changedTempFromIteration)
 
 float calculateChange(int numThreadsCounter)
 {
-	
+	int trackArray[numThreadsCounter]={0};
 	float minTempChanged = 0.0;
 	
 	//open mp for loop to parallize the solution 
 #pragma omp parallel num_threads(numThreadsCounter)
 	{
-
+	int myThreadId = omp_get_thread_num();
 	float changedTemp = 0.0;
 #pragma omp for
 		for(int c=1; c<maxSize-1; c++)
@@ -155,7 +158,7 @@ float calculateChange(int numThreadsCounter)
 			for(int r=1;r<maxSize-1;r++)
 			{
 			  changedTemp = ((array1[c][r+1] + array1[c][r-1] + array1[c-1][r] + array1[c+1][r]) /4); //takes the average of the 4 neighbors 
-#pragma omp critical
+//#pragma omp critical
 				  if(minTempChanged < abs((array1[c][r] - changedTemp)))
 				  {
 					
