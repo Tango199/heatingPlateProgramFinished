@@ -1,7 +1,7 @@
 //Ryan Schleritzauer
 //Jacobi Iteration
 //This program heats up a heating plate until the episolon value is hit, or the counter hits the max iterations
-//THe number that the serial solution answer is is 3371
+//THe number that the serial solution answer is is 3369
 
 #include <iostream>
 #include <ctime>
@@ -142,7 +142,7 @@ float calculateChange(int numThreadsCounter)
 	float minTempChanged = 0.0;
 
 
-#pragma acc parallel loop reduction(max:minTempChanged)
+#pragma acc parallel loop reduction(std::max:minTempChanged)
 		for(int c=1; c<maxSize-1; c++)
 		{
 			for(int r=1;r<maxSize-1;r++)
