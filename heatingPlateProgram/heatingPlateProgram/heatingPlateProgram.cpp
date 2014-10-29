@@ -20,7 +20,9 @@ const int maxIterations = 5000;
 clock_t startIteration,endIteration,startProgram, endProgram;
 float differenceIteration=0.0;
 float differenceProgram=0.0;
-int numThreadsCounter=4;
+const int numThreadsCounter=4;
+const int PAD = 16;
+float trackArray[numThreadsCounter][PAD];
 void eyeCandy(int counter,float changedTempFromIteration);
 void printArray();
 float calculateChange(int numThreadsCounter);
@@ -144,13 +146,18 @@ void eyeCandy(int counter,float changedTempFromIteration)
 
 float calculateChange(int numThreadsCounter)
 {
-	int trackArray[numThreadsCounter]={0};
+
+	for(int i=0; i < numThreadsCounter; i++)
+	{
+		trackArray[i][PAD] = 0;
+	}
+	
 	float minTempChanged = 0.0;
 	
 	//open mp for loop to parallize the solution 
 #pragma omp parallel num_threads(numThreadsCounter)
 	{
-	int myThreadId = omp_get_thread_num();
+	
 	float changedTemp = 0.0;
 #pragma omp for
 		for(int c=1; c<maxSize-1; c++)
@@ -158,11 +165,12 @@ float calculateChange(int numThreadsCounter)
 			for(int r=1;r<maxSize-1;r++)
 			{
 			  changedTemp = ((array1[c][r+1] + array1[c][r-1] + array1[c-1][r] + array1[c+1][r]) /4); //takes the average of the 4 neighbors 
+			  int myThreadId = omp_get_thread_num();
 //#pragma omp critical
-				  if(minTempChanged < abs((array1[c][r] - changedTemp)))
+				  if(trackArray[myThreadId][PAD] < abs((array1[c][r] - changedTemp)))
 				  {
 					
-					  minTempChanged = abs((array1[c][r] - changedTemp)); //checks to see if it is smaller than last temp change
+					  trackArray[myThreadId][PAD] = abs((array1[c][r] - changedTemp)); //checks to see if it is smaller than last temp change
 				  }	
 			  array2[c][r] = changedTemp; //sets array2 loc to the changedTemp
 			
@@ -171,6 +179,15 @@ float calculateChange(int numThreadsCounter)
 
 
 		}
+
+		for(int i=0; i < numThreadsCounter; i++)
+		{
+			if(trackArray[i][PAD] < minTempChanged)
+			{
+				minTempChanged = trackArray[i][PAD];
+			}
+		}
+
 #pragma omp for 
 		for(int c=1; c < maxSize-1; c++)
 		{
