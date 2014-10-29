@@ -23,7 +23,7 @@ float differenceProgram=0.0;
 int numThreadsCounter=4;
 void eyeCandy(int counter,float changedTempFromIteration);
 void printArray();
-float calculateChange(int numThreadsCounter);
+inline float calculateChange(int numThreadsCounter);
 
 int main()
 {
@@ -65,7 +65,36 @@ int main()
 		while(counter <= maxIterations && changedTempFrom1Interation >= eplsilonCutOff)
 		{
 			//startIteration = clock();
-			changedTempFrom1Interation = calculateChange(numThreadsCounter); //goes to the calculate change function, which does an interation across the plate changing the temp
+			//changedTempFrom1Interation = calculateChange(numThreadsCounter); //goes to the calculate change function, which does an interation across the plate changing the temp
+				
+
+			changedTempFrom1Interation = 0.0;
+
+
+#pragma acc parallel loop reduction(std::max:minTempChanged)
+		for(int c=1; c<maxSize-1; c++)
+		{
+			for(int r=1;r<maxSize-1;r++)
+			{
+			  array2[c][r] = ((array1[c][r+1] + array1[c][r-1] + array1[c-1][r] + array1[c+1][r]) /4); //takes the average of the 4 neighbors
+
+			  changedTempFrom1Interation = std::max(changedTempFrom1Interation,(float)(abs(array2[c][r] - array1[c][r]))); //checks to see if it is smaller than last temp change
+				//minTempChanged = max(minTempChanged,(array2[c][r] - array1[c][r])); //checks to see if it is smaller than last temp change
+
+			}
+
+
+		}
+#pragma acc parallel loop
+		for(int c=0; c<maxSize-1; c++)
+		{
+			for(int r=0; r<maxSize-1;r++)
+			{
+				array1[c][r] = array2[c][r];
+			}
+		}
+
+
 			//endIteration = clock();
 			//every 100 iterations print out info for the user
 			if(counter % 100 == 0)
