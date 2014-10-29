@@ -6,6 +6,7 @@
 #include <iostream>
 #include <ctime>
 #include <cmath>
+#include <omp.h>
 #include <fstream>
 using namespace std;
 
@@ -60,7 +61,7 @@ int main()
 		}
 
 	//(r*100)/(MAX-1)
-#pragma acc data copy(array1),create(array2)
+
 	//breaks out of loop if counter <= max iterations
 		while(counter <= maxIterations && changedTempFrom1Interation >= eplsilonCutOff)
 		{
@@ -141,8 +142,9 @@ float calculateChange(int numThreadsCounter)
 
 	float minTempChanged = 0.0;
 
-
-#pragma acc parallel loop reduction(std::max:minTempChanged)
+#pragma omp parallel num_threads(numThreadsCounter) reduction(max:minTempChanged)
+	{
+#pragma omp for
 		for(int c=1; c<maxSize-1; c++)
 		{
 			for(int r=1;r<maxSize-1;r++)
@@ -150,13 +152,13 @@ float calculateChange(int numThreadsCounter)
 			  array2[c][r] = ((array1[c][r+1] + array1[c][r-1] + array1[c-1][r] + array1[c+1][r]) /4); //takes the average of the 4 neighbors
 
 			  minTempChanged = std::max(minTempChanged,(float)(abs(array2[c][r] - array1[c][r]))); //checks to see if it is smaller than last temp change
-				//minTempChanged = max(minTempChanged,(array2[c][r] - array1[c][r])); //checks to see if it is smaller than last temp change
+				
 
 			}
 
 
 		}
-#pragma acc parallel loop
+#pragma omp for
 		for(int c=0; c<maxSize-1; c++)
 		{
 			for(int r=0; r<maxSize-1;r++)
@@ -164,6 +166,7 @@ float calculateChange(int numThreadsCounter)
 				array1[c][r] = array2[c][r];
 			}
 		}
+	}
 
 
 	return minTempChanged; //return the minTempChanged to main to check for epislon
