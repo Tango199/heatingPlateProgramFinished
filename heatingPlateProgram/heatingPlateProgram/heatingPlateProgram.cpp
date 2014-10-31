@@ -66,12 +66,12 @@ int main()
 		{
 			//startIteration = clock();
 			//changedTempFrom1Interation = calculateChange(numThreadsCounter); //goes to the calculate change function, which does an interation across the plate changing the temp
-				
+
 
 			changedTempFrom1Interation = 0.0;
 
 
-#pragma acc parallel loop reduction(std::max:minTempChanged)
+#pragma acc parallel loop reduction(max:minTempChanged)
 		for(int c=1; c<maxSize-1; c++)
 		{
 			for(int r=1;r<maxSize-1;r++)
@@ -165,35 +165,36 @@ void eyeCandy(int counter,float changedTempFromIteration)
 }
 //this funcation calculates the change between the places on the plate
 
-float calculateChange(int numThreadsCounter)
-{
 
-	float minTempChanged = 0.0;
+//float calculateChange(int numThreadsCounter)
+//{
+
+	//float minTempChanged = 0.0;
 
 
-#pragma acc parallel loop reduction(std::max:minTempChanged)
-		for(int c=1; c<maxSize-1; c++)
-		{
-			for(int r=1;r<maxSize-1;r++)
-			{
-			  array2[c][r] = ((array1[c][r+1] + array1[c][r-1] + array1[c-1][r] + array1[c+1][r]) /4); //takes the average of the 4 neighbors
+//#pragma acc parallel loop reduction(std::max:minTempChanged)
+	//	for(int c=1; c<maxSize-1; c++)
+		//{
+			//for(int r=1;r<maxSize-1;r++)
+			//{
+			  //array2[c][r] = ((array1[c][r+1] + array1[c][r-1] + array1[c-1][r] + array1[c+1][r]) /4); //takes the average of the 4 neighbors
 
-			  minTempChanged = std::max(minTempChanged,(float)(abs(array2[c][r] - array1[c][r]))); //checks to see if it is smaller than last temp change
+			  //minTempChanged = std::max(minTempChanged,(float)(abs(array2[c][r] - array1[c][r]))); //checks to see if it is smaller than last temp change
 				//minTempChanged = max(minTempChanged,(array2[c][r] - array1[c][r])); //checks to see if it is smaller than last temp change
 
-			}
+			//}
 
 
-		}
-#pragma acc parallel loop
-		for(int c=0; c<maxSize-1; c++)
-		{
-			for(int r=0; r<maxSize-1;r++)
-			{
-				array1[c][r] = array2[c][r];
-			}
-		}
+		//}
+//#pragma acc parallel loop
+	//	for(int c=0; c<maxSize-1; c++)
+		//{
+			//for(int r=0; r<maxSize-1;r++)
+			//{
+				//array1[c][r] = array2[c][r];
+			//}
+	//	}
 
 
-	return minTempChanged; //return the minTempChanged to main to check for epislon
-}
+	//return minTempChanged; //return the minTempChanged to main to check for epislon
+//}
