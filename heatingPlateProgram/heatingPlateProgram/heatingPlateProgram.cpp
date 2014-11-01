@@ -7,7 +7,6 @@
 #include <ctime>
 #include <cmath>
 #include <omp.h>
-#include <fstream>
 using namespace std;
 
 // 1002 because of the constant area around
@@ -21,7 +20,7 @@ const int maxIterations = 5000;
 clock_t startIteration,endIteration,startProgram, endProgram;
 float differenceIteration=0.0;
 float differenceProgram=0.0;
-int numThreadsCounter=4;
+int numThreadsCounter=8;
 void eyeCandy(int counter,float changedTempFromIteration);
 void printArray();
 float calculateChange(int numThreadsCounter);
@@ -63,16 +62,57 @@ int main()
 	//(r*100)/(MAX-1)
 
 	//breaks out of loop if counter <= max iterations
+	//#pragma acc data copy(array1),create(array2)
 		while(counter <= maxIterations && changedTempFrom1Interation >= eplsilonCutOff)
 		{
 			//startIteration = clock();
-			changedTempFrom1Interation = calculateChange(numThreadsCounter); //goes to the calculate change function, which does an interation across the plate changing the temp
+		//	changedTempFrom1Interation = calculateChange(numThreadsCounter); //goes to the calculate change function, which does an interation across the plate changing the temp
+
+
+					changedTempFrom1Interation = 0.0;
+
+		omp_set_num_threads(numThreadsCounter);
+
+#pragma omp parallel reduction(max:changedTempFrom1Interation)
+//{
+
+	#pragma omp for
+	//#pragma acc parallel loop reduction(max:changedTempFrom1Interation)
+		for(int c=1; c<maxSize-1; c++)
+		{
+			for(int r=1;r<maxSize-1;r++)
+			{
+			  array2[c][r] = ((array1[c][r+1] + array1[c][r-1] + array1[c-1][r] + array1[c+1][r]) /4); //takes the average of the 4 neighbors
+
+			  changedTempFrom1Interation = std::max(changedTempFrom1Interation,(float)(abs(array2[c][r] - array1[c][r]))); //checks to see if it is smaller than last temp change
+				//minTempChanged = max(minTempChanged,(array2[c][r] - array1[c][r])); //checks to see if it is smaller than last temp change
+
+			}
+
+
+		}
+#pragma omp for
+//#pragma acc parallel loop
+		for(int c=0; c<maxSize-1; c++)
+		{
+			for(int r=0; r<maxSize-1;r++)
+			{
+				array1[c][r] = array2[c][r];
+			}
+		}
+//}
+
+
+
+
+
+
 			//endIteration = clock();
 			//every 100 iterations print out info for the user
-			if(counter % 100 == 0)
-			{
-				eyeCandy(counter,changedTempFrom1Interation);
-			}
+		//	if(counter % 100 == 0)
+			//{
+				//eyeCandy(counter,changedTempFrom1Interation);
+			//}
 			//printArray();
 			counter++;
 
@@ -84,15 +124,7 @@ int main()
 				eyeCandy(counter,changedTempFrom1Interation);
 
 				endProgram = clock();
-				ofstream myfile; //outputs results to text file for testing purposes
-				myfile.open ("results.txt",ios::app);
-				myfile << "Iteration count is " << counter << endl;
-				myfile <<  "The max temperature change for this iteration was " << changedTempFrom1Interation << endl;
-				myfile << "The number of threads was " << numThreadsCounter << endl;
-				myfile << "The time it took for the whole program to run was " << (float)((endProgram - startProgram)/CLOCKS_PER_SEC) << " seconds" << endl;
-				myfile << endl;
-				myfile << endl;
-				myfile.close();
+
 				cout << "The time it took for the whole program to run was " << (float)((endProgram - startProgram)/CLOCKS_PER_SEC) << " seconds" << endl;
 			}
 			else if(counter <=maxIterations)
@@ -137,38 +169,38 @@ void eyeCandy(int counter,float changedTempFromIteration)
 }
 //this funcation calculates the change between the places on the plate
 
-float calculateChange(int numThreadsCounter)
-{
+//float calculateChange(int numThreadsCounter)
+//{
 
-	float minTempChanged = 0.0;
+	//float minTempChanged = 0.0;
 
-	omp_set_num_threads(numThreadsCounter);
-#pragma omp parallel reduction(max:minTempChanged)
-	{
-#pragma omp for
-		for(int c=1; c<maxSize-1; c++)
-		{
-			for(int r=1;r<maxSize-1;r++)
-			{
-			  array2[c][r] = ((array1[c][r+1] + array1[c][r-1] + array1[c-1][r] + array1[c+1][r]) /4); //takes the average of the 4 neighbors
+	//omp_set_num_threads(numThreadsCounter);
+//#pragma omp parallel reduction(max:minTempChanged)
+	//{
+//#pragma omp for
+		//for(int c=1; c<maxSize-1; c++)
+	//	{
+			//for(int r=1;r<maxSize-1;r++)
+			//{
+			  //array2[c][r] = ((array1[c][r+1] + array1[c][r-1] + array1[c-1][r] + array1[c+1][r]) /4); //takes the average of the 4 neighbors
 
-			  minTempChanged = std::max(minTempChanged,(float)(abs(array2[c][r] - array1[c][r]))); //checks to see if it is smaller than last temp change
-				
-
-			}
+			  //minTempChanged = std::max(minTempChanged,(float)(abs(array2[c][r] - array1[c][r]))); //checks to see if it is smaller than last temp change
 
 
-		}
-#pragma omp for
-		for(int c=0; c<maxSize-1; c++)
-		{
-			for(int r=0; r<maxSize-1;r++)
-			{
-				array1[c][r] = array2[c][r];
-			}
-		}
-	}
+			//}
 
 
-	return minTempChanged; //return the minTempChanged to main to check for epislon
-}
+		//}
+//#pragma omp for
+		//for(int c=0; c<maxSize-1; c++)
+		//{
+			//for(int r=0; r<maxSize-1;r++)
+			//{
+				//array1[c][r] = array2[c][r];
+			//}
+		//}
+	//}
+
+
+	//return minTempChanged; //return the minTempChanged to main to check for epislon
+//}

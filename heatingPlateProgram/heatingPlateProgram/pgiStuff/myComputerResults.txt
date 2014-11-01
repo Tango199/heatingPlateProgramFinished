@@ -1,0 +1,19 @@
+open mp my computer (4 threads)
+3370
+48 seconds
+
+open mp my computer (8 threads)
+3370
+201 seconds....? 
+
+serial my computer 
+3370
+35 seconds
+
+OpenAcc smart on my computer
+3370
+26 seconds
+
+OpenACC not smart on my computer
+3370
+27 seconds...
