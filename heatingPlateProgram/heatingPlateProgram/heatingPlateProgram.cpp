@@ -1,7 +1,7 @@
 //Ryan Schleritzauer
 //Jacobi Iteration
 //This program heats up a heating plate until the episolon value is hit, or the counter hits the max iterations
-//THe number that the serial solution answer is is 3369
+//THe number that the serial solution answer is is 3368
 
 #include <iostream>
 #include <ctime>
@@ -32,7 +32,7 @@ int main()
 
 
 		startProgram = clock();
-		int counter = 1;
+		int counter = 0;
 		float changedTempFrom1Interation=100.0;
 
 		//set up the initial heating plate with the constants that need set
@@ -142,7 +142,8 @@ float calculateChange(int numThreadsCounter)
 
 	float minTempChanged = 0.0;
 
-#pragma omp parallel num_threads(numThreadsCounter) reduction(max:minTempChanged)
+	omp_set_num_threads(numThreadsCounter);
+#pragma omp parallel reduction(max:minTempChanged)
 	{
 #pragma omp for
 		for(int c=1; c<maxSize-1; c++)
